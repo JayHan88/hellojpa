@@ -34,11 +34,17 @@ public class Main {
 			team.getMembers().add(member);
 			em.persist(member);
 
-			em.flush();
-			em.clear();
+			em.flush(); // Dirty Checking (변경 감지) - 변경 사항이 있으면 update query 를 추가적으로 날린다. 쓰기 지연 SQL 저장소에 있는 query 를 DB 에 반영한다.
+			em.clear(); // 영속성 conetext 에 있는 1차 cache 를 모두 지운다.
 
 			// Member -> Team
-//			Member findMember = em.find(Member.class, member.getId());
+			Member findMember = em.find(Member.class, member.getId());
+//			em.detach(findMember);
+//			em.clear();
+//			findMember.setName("T아카데미");
+
+			tx.commit(); // flush + commit, flush 자동 호
+
 //			Team findTeam = findMember.getTeam();
 //			findTeam.getName();
 
@@ -51,8 +57,6 @@ public class Main {
 //			Team findTeam2 = em.find(Team.class, team.getId());
 //			int MemberSize = findTeam2.getMembers().size();
 //			System.out.println(MemberSize);
-
-			tx.commit();
 		} catch (Exception e) {
 			tx.rollback();
 		} finally {

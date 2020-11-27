@@ -20,7 +20,7 @@ public class Member {
 	private int age;
 
 	// @ManyToOne(fetch = FetchType.EAGER) // JOIN 해서 미리 가져옴
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY) // Member 를 조회하면 Member 만 조회하고 Team 은 조회하지 않음 (fake class), 실제 team 을 사용하는 시점에 DB 조회를 통한 객체 초기화
 	@JoinColumn(name = "TEAM_ID")
 	private Team team;
 
@@ -60,13 +60,4 @@ public class Member {
 		this.team = team;
 	}
 
-	@Override
-	public String toString() {
-		return "Member{" +
-			       "id=" + id +
-			       ", name='" + name + '\'' +
-			       ", age=" + age +
-			       ", team=" + team +
-			       '}';
-	}
 }
