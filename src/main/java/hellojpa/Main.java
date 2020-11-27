@@ -2,6 +2,7 @@ package hellojpa;
 
 import hellojpa.entity.Member;
 import hellojpa.entity.Team;
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
@@ -27,15 +28,29 @@ public class Main {
 			Member member = new Member();
 			member.setName("Jay");
 			member.setAge(29);
-			member.setTeamId(team.getId());
+
+			// 두 군데 그냥 모두 다 넣어라.
+			member.setTeam(team);
+			team.getMembers().add(member);
 			em.persist(member);
 
-			// 객체를 테이블에 맞추어 데이터 중심으로 모델링하면, 협력 관계를 만들 수 없다.
-			Member findMember = em.find(Member.class, member.getId());
-			Long teamId = findMember.getTeamId();
-			Team findTeam = em.find(Team.class, teamId);
-			System.out.println(findMember.getName());
-			System.out.println(findTeam.getName());
+			em.flush();
+			em.clear();
+
+			// Member -> Team
+//			Member findMember = em.find(Member.class, member.getId());
+//			Team findTeam = findMember.getTeam();
+//			findTeam.getName();
+
+//			List<Member> members = findTeam.getMembers();
+//			for (Member member1 : members) {
+//				System.out.println("member1 = " + member1.toString());
+//			}
+
+			// Team -> Member
+//			Team findTeam2 = em.find(Team.class, team.getId());
+//			int MemberSize = findTeam2.getMembers().size();
+//			System.out.println(MemberSize);
 
 			tx.commit();
 		} catch (Exception e) {
