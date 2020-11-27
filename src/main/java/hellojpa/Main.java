@@ -1,7 +1,7 @@
 package hellojpa;
 
 import hellojpa.entity.Member;
-import hellojpa.entity.MemberType;
+import hellojpa.entity.Team;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
@@ -19,14 +19,24 @@ public class Main {
 		tx.begin();
 
 		try {
+
+			Team team = new Team();
+			team.setName("teamA");
+			em.persist(team);
+
 			Member member = new Member();
-			// member.setId(100L);
 			member.setName("Jay");
 			member.setAge(29);
-			member.setMemberType(MemberType.USER);
-
-
+			member.setTeamId(team.getId());
 			em.persist(member);
+
+			// 객체를 테이블에 맞추어 데이터 중심으로 모델링하면, 협력 관계를 만들 수 없다.
+			Member findMember = em.find(Member.class, member.getId());
+			Long teamId = findMember.getTeamId();
+			Team findTeam = em.find(Team.class, teamId);
+			System.out.println(findMember.getName());
+			System.out.println(findTeam.getName());
+
 			tx.commit();
 		} catch (Exception e) {
 			tx.rollback();
