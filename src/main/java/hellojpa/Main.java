@@ -28,22 +28,41 @@ public class Main {
 			Member member = new Member();
 			member.setName("Jay");
 			member.setAge(29);
-
-			// 두 군데 그냥 모두 다 넣어라.
+			// 양 쪽 객체에 모두 값을 넣어라
 			member.setTeam(team);
-			team.getMembers().add(member);
 			em.persist(member);
+			team.getMembers().add(member);
 
-			em.flush(); // Dirty Checking (변경 감지) - 변경 사항이 있으면 update query 를 추가적으로 날린다. 쓰기 지연 SQL 저장소에 있는 query 를 DB 에 반영한다.
-			em.clear(); // 영속성 conetext 에 있는 1차 cache 를 모두 지운다.
+//			em.flush(); // Dirty Checking (변경 감지) - 변경 사항이 있으면 update query 를 추가적으로 날린다. 쓰기 지연 SQL 저장소에 있는 query 를 DB 에 반영한다.
+//			em.clear(); // 영속성 conetext 에 있는 1차 cache 를 모두 지운다.
+
+			// 기본 JPQL - List 객체 하나마다 쿼리가 한 번 나가서 비추함
+//			String jpql = "select m From Member m where m.name = 'Jay'";
+//			List<Member> result = em.createQuery(jpql, Member.class).getResultList();
+//			for (Member x : result) {
+//				System.out.println("username = " + x.getName() + ", " + "teamname = " + member.getTeam().getName());
+//			}
+
+			// fetch join 방법
+			String jpql2 = "select m from Member m join fetch m.team";
+			List<Member> result2 = em.createQuery(jpql2, Member.class).setFirstResult(0).setMaxResults(20).getResultList();
+			for (Member y : result2) {
+				System.out.println("username = " + y.getName() + ", " + "teamname = " + member.getTeam().getName());
+			}
+
+			tx.commit();
+
+//			//Name Query 이용
+//			List<Member> result3 = em.createNamedQuery("Member.findByUsername", Member.class).setParameter("name", "Jay").getResultList();
+//			for (Member z : result3) {
+//				System.out.println("username = " + z.getName() + ", " + "teamname = " + member.getTeam().getName());
+//			}
 
 			// Member -> Team
-			Member findMember = em.find(Member.class, member.getId());
+//			Member findMember = em.find(Member.class, member.getId());
 //			em.detach(findMember);
 //			em.clear();
 //			findMember.setName("T아카데미");
-
-			tx.commit(); // flush + commit, flush 자동 호
 
 //			Team findTeam = findMember.getTeam();
 //			findTeam.getName();
@@ -61,6 +80,7 @@ public class Main {
 			tx.rollback();
 		} finally {
 			em.close();
+
 		}
 		emf.close();
 	}
